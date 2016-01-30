@@ -149,6 +149,7 @@ public class Robot extends IterativeRobot {
     	SmartDashboard.putNumber("PDP Voltage", pdp.getVoltage());
     	SmartDashboard.putNumber("PDP Amp", pdp.getTotalCurrent());
     	SmartDashboard.putNumber("PDP Amp 0", pdp.getCurrent(0));
+    	SmartDashboard.putNumber("talon_arm value", talon_arm.get());
     }
     
     /**
