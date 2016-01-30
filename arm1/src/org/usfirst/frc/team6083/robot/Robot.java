@@ -3,7 +3,10 @@ package org.usfirst.frc.team6083.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import com.ni.vision.NIVision;
+import com.ni.vision.NIVision.DrawMode;
 import com.ni.vision.NIVision.Image;
+import com.ni.vision.NIVision.ShapeMode;
 
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
@@ -57,6 +60,14 @@ public class Robot extends IterativeRobot {
         chooser.addDefault("Default Auto", defaultAuto);
         chooser.addObject("My Auto", customAuto);
         SmartDashboard.putData("Auto choices", chooser);
+        
+        //camera
+        frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
+
+        // the camera name (ex "cam0") can be found through the roborio web interface
+        session = NIVision.IMAQdxOpenCamera("cam0",
+                NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+        NIVision.IMAQdxConfigureGrab(session);
     }
     
 	/**
@@ -93,63 +104,80 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
-    	Double SpeedControal = 2.0;
+        /**
+         * grab an image, draw the circle, and provide it for the camera server
+         * which will in turn send it to the dashboard.
+         */
+        NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
+
+        while (isOperatorControl() && isEnabled()) {
+
+            NIVision.IMAQdxGrab(session, frame, 1);
+            NIVision.imaqDrawShapeOnImage(frame, frame, rect,
+                    DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
+            
+            CameraServer.getInstance().setImage(frame);
+
+            Double SpeedControal = 2.0;
     	
-    	//Joystick controal
-       	if(-joy_3d.getRawAxis(1)>0.1||-joy_3d.getRawAxis(1)<0.6){
-            val = -joy.getRawAxis(1);
-       	}	
-       	else if(-joy_3d.getRawAxis(1)>0.5){
-       		val = 0.5;
-       	}
-       	else{
-       		val = 0.0;	
-       	}
+            //Joystick controal
+            if(-joy_3d.getRawAxis(1)>0.1||-joy_3d.getRawAxis(1)<0.6){
+            	val = -joy.getRawAxis(1);
+            }	
+            else if(-joy_3d.getRawAxis(1)>0.5){
+            	val = 0.5;
+            }
+            else{
+            	val = 0.0;	
+            }
     	
     	
-    	if(joy.getRawAxis(1)>0.1 || joy.getRawAxis(1)<-0.1){		
-            LY = joy.getRawAxis(1);
-        }	
-        else{
-            LY = 0.0 ;	
-        }	
-    	if(joy.getRawAxis(5)>0.1 || joy.getRawAxis(5)<-0.1){		
-            RY = joy.getRawAxis(5);
-        }	
-        else{
-            RY = 0.0 ;	
-        }	
+            if(joy.getRawAxis(1)>0.1 || joy.getRawAxis(1)<-0.1){		
+            	LY = joy.getRawAxis(1);
+            }	
+            else{
+            	LY = 0.0 ;	
+            }	
+            if(joy.getRawAxis(5)>0.1 || joy.getRawAxis(5)<-0.1){		
+            	RY = joy.getRawAxis(5);
+            }	
+            else{
+            	RY = 0.0 ;	
+            }	
 
     	
-    	//motor controal
+            //motor controal
     	
-       	talon_arm.set(val);
+            talon_arm.set(val);
        	
-    	if(left.get()){
-    		talon_left.set(LY/SpeedControal);                     	
-    	}	
-    	else {
-    		talon_left.set(LY/(SpeedControal*2));
-    	}
+            if(left.get()){
+            	talon_left.set(LY/SpeedControal);                     	
+            }	
+            else {
+            	talon_left.set(LY/(SpeedControal*2));
+            }
     	
-    	if(right.get()){
-    		talon_right.set(-RY/SpeedControal);                     	
-    	}	
-    	else {
-    		talon_right.set(-RY/(SpeedControal*2));
-    	}
+            if(right.get()){
+            	talon_right.set(-RY/SpeedControal);                     	
+            }	
+            else {
+            	talon_right.set(-RY/(SpeedControal*2));
+            }
        	
-    	SmartDashboard.putNumber(" 3D Y value", joy.getRawAxis(1));
-    	SmartDashboard.putNumber("Left Motor Encoder Value", -talon_left.get());
-    	SmartDashboard.putNumber("Right Motor Encoder Value", talon_right.get());
-    	SmartDashboard.putNumber("spSpeedControaleed", (-talon_left.get()+ talon_right.get())/2);
-    	SmartDashboard.putNumber("Speed Plot", (-talon_left.get()+ talon_right.get())/2);
-    	SmartDashboard.putNumber("LY value", joy.getRawAxis(1));
-    	SmartDashboard.putNumber("RY value", joy.getRawAxis(5));
-    	SmartDashboard.putNumber("PDP Voltage", pdp.getVoltage());
-    	SmartDashboard.putNumber("PDP Amp", pdp.getTotalCurrent());
-    	SmartDashboard.putNumber("PDP Amp 0", pdp.getCurrent(0));
-    	SmartDashboard.putNumber("talon_arm value", talon_arm.get());
+            SmartDashboard.putNumber(" 3D Y value", joy.getRawAxis(1));
+            SmartDashboard.putNumber("Left Motor Encoder Value", -talon_left.get());
+            SmartDashboard.putNumber("Right Motor Encoder Value", talon_right.get());
+            SmartDashboard.putNumber("spSpeedControaleed", (-talon_left.get()+ talon_right.get())/2);
+            SmartDashboard.putNumber("Speed Plot", (-talon_left.get()+ talon_right.get())/2);
+            SmartDashboard.putNumber("LY value", joy.getRawAxis(1));
+            SmartDashboard.putNumber("RY value", joy.getRawAxis(5));
+            SmartDashboard.putNumber("PDP Voltage", pdp.getVoltage());
+            SmartDashboard.putNumber("PDP Amp", pdp.getTotalCurrent());
+            SmartDashboard.putNumber("PDP Amp 0", pdp.getCurrent(0));
+            SmartDashboard.putNumber("talon_arm value", talon_arm.get());
+            
+        }
+        NIVision.IMAQdxStopAcquisition(session);
     }
     
     /**
