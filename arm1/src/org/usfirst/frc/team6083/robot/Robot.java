@@ -2,7 +2,11 @@ package org.usfirst.frc.team6083.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import com.ni.vision.NIVision.Image;
+
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -17,10 +21,31 @@ public class Robot extends IterativeRobot {
     String autoSelected;
     SendableChooser chooser;
     
-    VictorSP arm_motor = new VictorSP(2);  
+    //motor
+    VictorSP talon_arm = new VictorSP(2);
+    VictorSP talon_left = new VictorSP(1);
+    VictorSP talon_right = new VictorSP(0);
     
-    Joystick joy = new Joystick(1);
+    //Joystick
+    Joystick joy = new Joystick(0);
+    Joystick joy_3d = new Joystick(1);
+    JoystickButton left = new JoystickButton(joy,5);
+    JoystickButton right = new JoystickButton(joy,6);
     
+    //Device
+    PowerDistributionPanel pdp = new PowerDistributionPanel(1);
+    Compressor comp = new Compressor(0);
+    
+    //SmartDashboard
+    Preferences pref;
+    
+    //camera
+    int session;
+    Image frame;
+    
+    //Double
+    Double LY;
+    Double RY;
     Double val;
 	
     /**
@@ -68,28 +93,60 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
+    	Double SpeedControal = 2.0;
     	
-       	if(-joy.getRawAxis(1)>0.1||-joy.getRawAxis(1)<0.6){
-            arm_motor.set(-joy.getRawAxis(1));	
+    	//Joystick controal
+       	if(-joy_3d.getRawAxis(1)>0.1||-joy_3d.getRawAxis(1)<0.6){
+            val = -joy.getRawAxis(1);
        	}	
-       	else if(-joy.getRawAxis(1)>0.5){
-       		arm_motor.set(0.5);	
+       	else if(-joy_3d.getRawAxis(1)>0.5){
+       		val = 0.5;
        	}
        	else{
-       		arm_motor.set(0);	
+       		val = 0.0;	
        	}
+    	
+    	
+    	if(joy.getRawAxis(1)>0.1 || joy.getRawAxis(1)<-0.1){		
+            LY = joy.getRawAxis(1);
+        }	
+        else{
+            LY = 0.0 ;	
+        }	
+    	if(joy.getRawAxis(5)>0.1 || joy.getRawAxis(5)<-0.1){		
+            RY = joy.getRawAxis(5);
+        }	
+        else{
+            RY = 0.0 ;	
+        }	
+
+    	
+    	//motor controal
+    	
+       	talon_arm.set(val);
        	
-       	if(-joy.getRawAxis(1)>-0.1||-joy.getRawAxis(1)<-0.6){
-            arm_motor.set(-joy.getRawAxis(1));	
-       	}	
-       	else if(-joy.getRawAxis(1)>-0.5){
-       		arm_motor.set(-0.5);	
-       	}
-       	else{
-       		arm_motor.set(0);	
-       	}
+    	if(left.get()){
+    		talon_left.set(LY/SpeedControal);                     	
+    	}	
+    	else {
+    		talon_left.set(LY/(SpeedControal*2));
+    	}
+    	
+    	if(right.get()){
+    		talon_right.set(-RY/SpeedControal);                     	
+    	}	
+    	else {
+    		talon_right.set(-RY/(SpeedControal*2));
+    	}
        	
     	SmartDashboard.putNumber("Y value", joy.getRawAxis(1));
+    	SmartDashboard.putNumber("Left Motor Encoder Value", -talon_left.get());
+    	SmartDashboard.putNumber("Right Motor Encoder Value", talon_right.get());
+    	SmartDashboard.putNumber("spSpeedControaleed", (-talon_left.get()+ talon_right.get())/2);
+    	SmartDashboard.putNumber("Speed Plot", (-talon_left.get()+ talon_right.get())/2);
+    	SmartDashboard.putNumber("LY value", joy.getRawAxis(1));
+    	SmartDashboard.putNumber("RY value", joy.getRawAxis(5));
+    	SmartDashboard.putNumber("PDP Voltage", pdp.getVoltage());
     }
     
     /**
