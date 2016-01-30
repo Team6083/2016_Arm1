@@ -139,7 +139,7 @@ public class Robot extends IterativeRobot {
     		talon_right.set(-RY/(SpeedControal*2));
     	}
        	
-    	SmartDashboard.putNumber("Y value", joy.getRawAxis(1));
+    	SmartDashboard.putNumber(" 3D Y value", joy.getRawAxis(1));
     	SmartDashboard.putNumber("Left Motor Encoder Value", -talon_left.get());
     	SmartDashboard.putNumber("Right Motor Encoder Value", talon_right.get());
     	SmartDashboard.putNumber("spSpeedControaleed", (-talon_left.get()+ talon_right.get())/2);
@@ -147,6 +147,8 @@ public class Robot extends IterativeRobot {
     	SmartDashboard.putNumber("LY value", joy.getRawAxis(1));
     	SmartDashboard.putNumber("RY value", joy.getRawAxis(5));
     	SmartDashboard.putNumber("PDP Voltage", pdp.getVoltage());
+    	SmartDashboard.putNumber("PDP Amp", pdp.getTotalCurrent());
+    	SmartDashboard.putNumber("PDP Amp 0", pdp.getCurrent(0));
     }
     
     /**
