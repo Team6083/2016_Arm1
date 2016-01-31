@@ -30,8 +30,8 @@ public class Robot extends IterativeRobot {
     VictorSP talon_right = new VictorSP(0);
     
     //Joystick
-    Joystick joy = new Joystick(0);
-    Joystick joy_3d = new Joystick(1);
+    Joystick joy = new Joystick(1);
+    Joystick joy_3d = new Joystick(0);
     JoystickButton left = new JoystickButton(joy,5);
     JoystickButton right = new JoystickButton(joy,6);
     
@@ -65,7 +65,7 @@ public class Robot extends IterativeRobot {
         frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
 
         // the camera name (ex "cam0") can be found through the roborio web interface
-        session = NIVision.IMAQdxOpenCamera("cam0",
+        session = NIVision.IMAQdxOpenCamera("cam1",
                 NIVision.IMAQdxCameraControlMode.CameraControlModeController);
         NIVision.IMAQdxConfigureGrab(session);
     }
@@ -121,6 +121,7 @@ public class Robot extends IterativeRobot {
             Double SpeedControal = 2.0;
     	
             //Joystick controal
+            
             if(-joy_3d.getRawAxis(1)>0.1||-joy_3d.getRawAxis(1)<0.6){
             	val = -joy.getRawAxis(1);
             }	
@@ -130,7 +131,7 @@ public class Robot extends IterativeRobot {
             else{
             	val = 0.0;	
             }
-    	
+            
     	
             if(joy.getRawAxis(1)>0.1 || joy.getRawAxis(1)<-0.1){		
             	LY = joy.getRawAxis(1);
@@ -171,9 +172,6 @@ public class Robot extends IterativeRobot {
             SmartDashboard.putNumber("Speed Plot", (-talon_left.get()+ talon_right.get())/2);
             SmartDashboard.putNumber("LY value", joy.getRawAxis(1));
             SmartDashboard.putNumber("RY value", joy.getRawAxis(5));
-            SmartDashboard.putNumber("PDP Voltage", pdp.getVoltage());
-            SmartDashboard.putNumber("PDP Amp", pdp.getTotalCurrent());
-            SmartDashboard.putNumber("PDP Amp 0", pdp.getCurrent(0));
             SmartDashboard.putNumber("talon_arm value", talon_arm.get());
             
         }
