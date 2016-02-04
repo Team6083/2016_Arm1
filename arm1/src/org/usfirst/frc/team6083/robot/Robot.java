@@ -30,8 +30,8 @@ public class Robot extends IterativeRobot {
     VictorSP talon_right = new VictorSP(0);
     
     //Joystick
-    Joystick joy = new Joystick(1);
-    Joystick joy_3d = new Joystick(0);
+    Joystick joy = new Joystick(0);
+    Joystick joy_3d = new Joystick(1);
     JoystickButton left = new JoystickButton(joy,5);
     JoystickButton right = new JoystickButton(joy,6);
     
@@ -64,7 +64,7 @@ public class Robot extends IterativeRobot {
         //camera
         frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
 
-        // the camera name (ex "cam0") can be found through the roborio web interface
+        // the camera name (ex "cam1") can be found through the roborio web interface
         session = NIVision.IMAQdxOpenCamera("cam1",
                 NIVision.IMAQdxCameraControlMode.CameraControlModeController);
         NIVision.IMAQdxConfigureGrab(session);
