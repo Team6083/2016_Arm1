@@ -30,14 +30,13 @@ public class Robot extends IterativeRobot {
     VictorSP talon_right = new VictorSP(0);
     
     //Joystick
-    Joystick joy = new Joystick(0);
-    Joystick joy_3d = new Joystick(1);
+    Joystick joy = new Joystick(1);
+    Joystick joy_3d = new Joystick(0);
     JoystickButton left = new JoystickButton(joy,5);
     JoystickButton right = new JoystickButton(joy,6);
     
     //Device
     PowerDistributionPanel pdp = new PowerDistributionPanel(1);
-    Compressor comp = new Compressor(0);
     
     //SmartDashboard
     Preferences pref;
@@ -65,7 +64,7 @@ public class Robot extends IterativeRobot {
         frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
 
         // the camera name (ex "cam1") can be found through the roborio web interface
-        session = NIVision.IMAQdxOpenCamera("cam1",
+        session = NIVision.IMAQdxOpenCamera("cam0",
                 NIVision.IMAQdxCameraControlMode.CameraControlModeController);
         NIVision.IMAQdxConfigureGrab(session);
     }
@@ -122,10 +121,10 @@ public class Robot extends IterativeRobot {
     	
             //Joystick controal
             
-            if(-joy_3d.getRawAxis(1)>0.1||-joy_3d.getRawAxis(1)<0.6){
-            	val = -joy.getRawAxis(1);
+            if(-joy_3d.getRawAxis(1)>0.1||-joy_3d.getRawAxis(1)<0.1){
+            	val = -joy_3d.getRawAxis(1);
             }	
-            else if(-joy_3d.getRawAxis(1)>0.5){
+            else if(-joy_3d.getRawAxis(1)>0.5||-joy_3d.getRawAxis(1)<-0.5){
             	val = 0.5;
             }
             else{
@@ -149,7 +148,7 @@ public class Robot extends IterativeRobot {
     	
             //motor controal
     	
-            talon_arm.set(val);
+            talon_arm.set(val/2);
        	
             if(left.get()){
             	talon_left.set(LY/SpeedControal);                     	
@@ -165,7 +164,7 @@ public class Robot extends IterativeRobot {
             	talon_right.set(-RY/(SpeedControal*2));
             }
        	
-            SmartDashboard.putNumber(" 3D Y value", joy.getRawAxis(1));
+            SmartDashboard.putNumber(" 3D Y value", joy_3d.getRawAxis(1));
             SmartDashboard.putNumber("Left Motor Encoder Value", -talon_left.get());
             SmartDashboard.putNumber("Right Motor Encoder Value", talon_right.get());
             SmartDashboard.putNumber("spSpeedControaleed", (-talon_left.get()+ talon_right.get())/2);
